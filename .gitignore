@@ -1,1 +1,4 @@
 venv
+MNIST
+*.pyc
+__pycache__
