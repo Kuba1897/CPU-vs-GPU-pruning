@@ -52,6 +52,9 @@ model_for_unstructured = copy.deepcopy(model)
 apply_structured_pruning(model, 2)
 apply_unstructured_pruning(model_for_unstructured)
 
+mask_removement(model)
+mask_removement(model_for_unstructured)
+
 total_params, trainable_params, no_zero , sparce = count_parameters(model)
 print(f"Total parameters: {total_params}")
 print(f"Trainable parameters: {trainable_params}")
@@ -87,7 +90,6 @@ print(f"Trainable parameters: {trainable_params}")
 print(f"Parameters with value 0: {total_params-no_zero}")
 print(f"Sparcity:  {sparce}")
 
-mask_removement(model)
 
 test_acc, tmer = accuracy(model, test_dataset, device)
 print(f"Test accuracy: {test_acc:.4f}")
