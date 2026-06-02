@@ -3,3 +3,4 @@ torchvision
 torchaudio
 numpy<2
 matplotlib
+scikit-learn

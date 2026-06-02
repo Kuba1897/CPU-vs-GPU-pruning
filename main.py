@@ -6,7 +6,7 @@ from models import PrunableCNN
 from datasets import get_alternative
 from train_test import train, test
 from statistics import accuracy, count_parameters, roc_and_statistics
-from pruning_utils import apply_unstructured_pruning
+from pruning_utils import apply_unstructured_pruning, apply_structured_pruning
 
 batch_size = 128
 device = "cpu"
@@ -49,7 +49,7 @@ print(f"Trainable parameters: {trainable_params}")
 roc_and_statistics(model, test_dataset, device, class_names)
 
 
-apply_unstructured_pruning(model)
+apply_structured_pruning(model, 2)
 
 total_params, trainable_params, no_zero , sparce = count_parameters(model)
 print(f"Total parameters: {total_params}")
