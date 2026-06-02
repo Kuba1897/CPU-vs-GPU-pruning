@@ -14,8 +14,8 @@ def apply_unstructured_pruning(model, amount=0.5):
         amount=amount
     )
 
-    for module, name in parameters_to_prune:
-        prune.remove(module, name)
+    #for module, name in parameters_to_prune:
+    #    prune.remove(module, name)
 
 def apply_structured_pruning(model, regularization, amount=0.5): #regularization może być 1 albo 2
     for module in model.modules():
@@ -30,6 +30,8 @@ def apply_structured_pruning(model, regularization, amount=0.5): #regularization
         if isinstance(module, nn.Linear):
             prune.ln_structured(module, name='weight', amount=amount, n=regularization, dim=1)
         
+
+def mask_removement(model):
     for module in model.modules():
         if isinstance(module, nn.Conv2d):
             prune.remove(module, "weight")

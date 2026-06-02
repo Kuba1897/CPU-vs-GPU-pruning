@@ -37,5 +37,6 @@ Rozpiska funkcji z pliku statistics.py:
 ## 6. Pruning
 Pruning mamy w dwóch wariantach: unstructured (usuwanie pojedyńczych wag) oraz structured (usuwanie grup wag). Dodatkowo każdy z nich może zostać przeprowadzony z wykorzystaniem regularyzacji L1 lub L2. W przypadku tego projektu używamy pruningu wbudowanego w bibliotekę PyTorch (lub fRAmEWOrk jeżeli chce któs być biznesowym ważniakiem) - co oznacza, że możemy porównać różnice w wykorzystaniu regularyzacji tylko dla structured pruningu, gdyż dla unstructured efektywnie nie ma implementacji L2. Oficjalny powód jest taki, że nie ma to wpływu na wynik końcowy.
 
- - `apply_unstructured_pruning`: unstructured pruning ~~no co ty nie powiesz~~, przyjmuje model oraz ammount od 0.0 do 1.0, jeżeli nie zostanie sprecyzowany to ustawia się na 0.5
- - `apply_structured_pruning`: structured pruning, przyjmuje to co powyżej, oraz regularization mogącą być równa 1 lub 2 (1 odpowiada L1, a 2 - L2)
+ - `apply_structured_pruning`: robi structured pruning L1 lub L2 - zależy co wybierzesz
+ - `apply_unstructured_pruning`: robi unstructured
+ - `mask_removement`: usuwa maski i ustawia wagi na 0 (dla kontekstu: pruning w torchu ustawia maski nad wagami, a nie fizycznie usuwa wagi)
