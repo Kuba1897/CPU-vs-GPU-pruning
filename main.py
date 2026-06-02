@@ -49,11 +49,14 @@ print(f"Trainable parameters: {trainable_params}")
 roc_and_statistics(model, test_dataset, device, class_names)
 
 model_for_unstructured = copy.deepcopy(model)
+optimizer_structured = optim.Adam(model.parameters(), lr=1e-3)
+optimizer_unstructured = optim.Adam(
+    model_for_unstructured.parameters(),
+    lr=1e-3
+)
 apply_structured_pruning(model, 2)
 apply_unstructured_pruning(model_for_unstructured)
 
-mask_removement(model)
-mask_removement(model_for_unstructured)
 
 total_params, trainable_params, no_zero , sparce = count_parameters(model)
 print(f"Total parameters: {total_params}")
@@ -72,7 +75,9 @@ print(f"Sparcity:  {sparce}")
 #smalled.to(device)
 
 for epoch in range(1):
-    train(model, device, train_dataset, optimizer)
+    train(model, device, train_dataset, optimizer_structured)
+
+mask_removement(model)
 
 total_params, trainable_params, no_zero , sparce = count_parameters(model)
 print(f"Total parameters: {total_params}")
@@ -82,7 +87,9 @@ print(f"Sparcity:  {sparce}")
 print("-----------------------------------------")
 
 for epoch in range(1):
-    train(model_for_unstructured, device, train_dataset, optimizer)
+    train(model_for_unstructured, device, train_dataset, optimizer_unstructured)
+
+mask_removement(model_for_unstructured)
 
 total_params, trainable_params, no_zero , sparce = count_parameters(model_for_unstructured)
 print(f"Total parameters: {total_params}")
@@ -94,6 +101,9 @@ print(f"Sparcity:  {sparce}")
 test_acc, tmer = accuracy(model, test_dataset, device)
 print(f"Test accuracy: {test_acc:.4f}")
 print(f"Approximate time needed for forward pass of 1 batch of inputs(120) using gpu: {tmer} seconds")
+test_acc, tmer = accuracy(model_for_unstructured, test_dataset, device)
+print(f"Test accuracy: {test_acc:.4f}")
+print(f"Time: {tmer}")
 
 #to do powyżej zakomentowanej części
 #for epoch in range(2*epochs):
