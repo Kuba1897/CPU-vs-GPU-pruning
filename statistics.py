@@ -28,7 +28,17 @@ def timer(model, loader, device):
 
     print(f"Approximate time needed for forward pass of 1 batch of inputs(120) using gpu: {time_calculation/amm} seconds")
 
+def model_size_mb(model):
+    param_size = 0
+    buffer_size = 0
 
+    for param in model.parameters():
+        param_size += param.nelement() * param.element_size()
+
+    for buffer in model.buffers():
+        buffer_size += buffer.nelement() * buffer.element_size()
+
+    return (param_size + buffer_size) / (1024 ** 2)
 
 def count_parameters(model, device):
     example_inputs = torch.randn(1, 3, 32, 32).to(device)
