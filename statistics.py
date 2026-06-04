@@ -1,5 +1,6 @@
 import torch, time
 import torch.nn.functional as F
+import torch_pruning as tp
 
 import numpy as np
 from sklearn.metrics import classification_report
@@ -7,11 +8,9 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
 from sklearn.preprocessing import label_binarize
 
-def accuracy(model, loader, device):
+def timer(model, loader, device):
     model.eval()
 
-    correct = 0
-    total = 0
     time_calculation = 0.0
     amm = 0
 
@@ -27,28 +26,20 @@ def accuracy(model, loader, device):
             time_calculation += (end-strt)
             amm +=1
 
-            correct += (predicted == labels).sum().item()
-            total += labels.size(0)
-
-    return correct / total, time_calculation/amm
+    print(f"Approximate time needed for forward pass of 1 batch of inputs(120) using gpu: {time_calculation/amm} seconds")
 
 
 
+def count_parameters(model, device):
+    example_inputs = torch.randn(1, 3, 32, 32).to(device)
 
-def count_parameters(model):
-    total = 0
-    nonzero = 0
-    trainable = 0
+    base_macs, base_params = tp.utils.count_ops_and_params(model, example_inputs)
 
-    for p in model.parameters():
-        total += p.numel()
-        nonzero += torch.count_nonzero(p).item()
-        if p.requires_grad:
-            trainable += p.numel()
+    print("--------------------------------------------------------")
+    print(model)
+    print(f"MACs: {base_macs / 1e6:.2f} M")
+    print(f"Params: {base_params / 1e6:.2f} M")
 
-    sparsity = 1 - nonzero / total
-
-    return total, trainable, nonzero, sparsity
 
 
 def collect_predictions(model, loader, device):
