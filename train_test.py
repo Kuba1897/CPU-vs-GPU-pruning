@@ -14,6 +14,7 @@ def train(model, device, train_loader, optimizer):
     print(f"Epoch done.")
 
 
+#zostawiam, ale chyba wogóle nie będziemy używać \/
 def test(model, device, test_loader):
     model.eval()
     criterion = nn.CrossEntropyLoss()

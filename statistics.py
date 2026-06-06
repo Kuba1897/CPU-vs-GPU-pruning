@@ -1,6 +1,7 @@
 import torch
 import time
 import torch.nn.functional as F
+import torch_pruning as tp
 
 import numpy as np
 from sklearn.metrics import classification_report
@@ -8,12 +9,9 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
 from sklearn.preprocessing import label_binarize
 
-
-def accuracy(model, loader, device):
+def timer(model, loader, device):
     model.eval()
 
-    correct = 0
-    total = 0
     time_calculation = 0.0
     amm = 0
 
@@ -32,60 +30,30 @@ def accuracy(model, loader, device):
             time_calculation += (end - start)
             amm += 1
 
-            correct += (predicted == labels).sum().item()
-            total += labels.size(0)
+    print(f"Approximate time needed for forward pass of 1 batch of inputs(120) using gpu: {time_calculation/amm} seconds")
 
-    return correct / total, time_calculation / amm
+def model_size_mb(model):
+    param_size = 0
+    buffer_size = 0
 
-
-def count_parameters(model):
-    total = 0
-    nonzero = 0
-    trainable = 0
-
-    visited = set()
-
-    # obsługa modeli z aktywnym pruningiem
-    for module in model.modules():
-
-        if hasattr(module, "weight_mask") and hasattr(module, "weight_orig"):
-
-            effective_weight = module.weight_orig * module.weight_mask
-
-            total += effective_weight.numel()
-            nonzero += torch.count_nonzero(effective_weight).item()
-
-            if module.weight_orig.requires_grad:
-                trainable += effective_weight.numel()
-
-            visited.add(id(module.weight_orig))
-
-            if getattr(module, "bias", None) is not None:
-                bias = module.bias
-
-                total += bias.numel()
-                nonzero += torch.count_nonzero(bias).item()
-
-                if bias.requires_grad:
-                    trainable += bias.numel()
-
-                visited.add(id(bias))
-
-    # pozostałe parametry
     for param in model.parameters():
+        param_size += param.nelement() * param.element_size()
 
-        if id(param) in visited:
-            continue
+    for buffer in model.buffers():
+        buffer_size += buffer.nelement() * buffer.element_size()
 
-        total += param.numel()
-        nonzero += torch.count_nonzero(param).item()
+    return (param_size + buffer_size) / (1024 ** 2)
 
-        if param.requires_grad:
-            trainable += param.numel()
+def count_parameters(model, device):
+    example_inputs = torch.randn(1, 3, 32, 32).to(device)
 
-    sparsity = 1.0 - (nonzero / total)
+    base_macs, base_params = tp.utils.count_ops_and_params(model, example_inputs)
 
-    return total, trainable, nonzero, sparsity
+    print("--------------------------------------------------------")
+    print(model)
+    print(f"MACs: {base_macs / 1e6:.2f} M")
+    print(f"Params: {base_params / 1e6:.2f} M")
+
 
 
 def model_size_mb(model):

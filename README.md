@@ -30,13 +30,20 @@ Funckja aktywacji w każdej warstwie to ReLU. Liczba klas jest równa 10
 ## 5. Statystyki używane do porównywania działania sieci
 Rozpiska funkcji z pliku statistics.py:
 
- - `accuracy`: Zwraca wynik Accuracy score dla danego modelu oraz czas przejścia 1 batcha (Jest szansa, że ta funkcja stanie się niepotrzebna)
- - `count_parameters`: Zwraca ilość parametrów, ilość niezerowych parametrów oraz sparcity sieci
+ - `timer`: Wypisuje czas przejścia dla 1 batcha
+ - `count_parameters`: Wypisuje ilość parametrów, MAC-ów oraz schemat modelu
  - `roc_and_statistics`: Zwraca wykres ROC oraz raport klasyfikacji (czyli recall, precision, f1-score dla wszystkich klas oraz accuracy) 
 
 ## 6. Pruning
 Pruning mamy w dwóch wariantach: unstructured (usuwanie pojedyńczych wag) oraz structured (usuwanie grup wag). Dodatkowo każdy z nich może zostać przeprowadzony z wykorzystaniem regularyzacji L1 lub L2. W przypadku tego projektu używamy pruningu wbudowanego w bibliotekę PyTorch (lub fRAmEWOrk jeżeli chce któs być biznesowym ważniakiem) - co oznacza, że możemy porównać różnice w wykorzystaniu regularyzacji tylko dla structured pruningu, gdyż dla unstructured efektywnie nie ma implementacji L2. Oficjalny powód jest taki, że nie ma to wpływu na wynik końcowy.
 
  - `apply_structured_pruning`: robi structured pruning L1 lub L2 - zależy co wybierzesz
- - `apply_unstructured_pruning`: robi unstructured
- - `mask_removement`: usuwa maski i ustawia wagi na 0 (dla kontekstu: pruning w torchu ustawia maski nad wagami, a nie fizycznie usuwa wagi)
+ - `apply_unstructured_pruning`: robi unstructured __WAŻNE__: parametr 'part_step'(domyślnie False) słuzy do decydowania czy chcemy zrobić kilka takich pruningów pod rząd - wtedy ten parametr musi być True dla wszytskich poza ostatnim. Na sam koniec pruningu wypisuje informacje o ilości zerowych parametrów, wszystkich parametró oraz sparcity
+
+## 7. Jak popełniać pruning?
+ - __Unstructured__ (L1/L2):
+    Trening modelu -> Analiza wyników na danych testowych -> `apply_unstructured_pruning` -> Dotrenowanie modelu -> Analiza wyników na danych testowych
+    __Ważne! Tutaj jeżeli unstructured pruning ma part_step = True, to nie uda się użyć `count_parameters` - wynika to z tego, że na sieci jest maska, która jest niekompatybilna z tą funkcją - można jej użyć dopiero po zroobieniu pruningu z part_step = False__
+    
+ - __Structured L1/L2__:
+    Trening modelu -> Analiza wyników na danych testowych -> `apply_structured_pruning` -> Dotrenowanie modelu -> Analiza wyników na danych testowych
