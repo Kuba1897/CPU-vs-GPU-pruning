@@ -1,3 +1,5 @@
+from fileinput import filename
+
 import torch
 import time
 import torch.nn.functional as F
@@ -91,7 +93,7 @@ def collect_predictions(model, loader, device):
     return all_probs, all_labels
 
 
-def roc_and_statistics(model, dataset, device, class_names):
+def roc_and_statistics(model, dataset, device, class_names, filename):
     y_score, y_true = collect_predictions(model, dataset, device)
 
     num_classes = 10
@@ -124,7 +126,8 @@ def roc_and_statistics(model, dataset, device, class_names):
     plt.title("ROC curves for CIFAR-10 classes")
     plt.legend()
     plt.grid()
-    plt.show()
+    plt.savefig(filename, dpi=300, bbox_inches="tight")
+    plt.close()
 
     y_pred = y_score.argmax(axis=1)
 

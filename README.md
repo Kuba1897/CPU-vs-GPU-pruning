@@ -47,3 +47,8 @@ Pruning mamy w dwóch wariantach: unstructured (usuwanie pojedyńczych wag) oraz
     
  - __Structured L1/L2__:
     Trening modelu -> Analiza wyników na danych testowych -> `apply_structured_pruning` -> Dotrenowanie modelu -> Analiza wyników na danych testowych
+
+## 8. Uruchomienie testów
+```bash
+python main.py
+```
