@@ -1,6 +1,10 @@
 # CPU-vs-GPU-pruning
 Piotr Nowak, Jakub Ledwoń
 
+## Raport 
+Projekt w Overleaf:  
+https://www.overleaf.com/read/kkkkrwvjbgyn#24acfa
+
 ## 1. Wersja Pythona
 Projekt wymaga Pythona **3.10 lub 3.11**.
 
