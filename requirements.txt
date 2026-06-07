@@ -4,3 +4,4 @@ torchaudio
 numpy<2
 matplotlib
 scikit-learn
+torch_pruning
